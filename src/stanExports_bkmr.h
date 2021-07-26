@@ -33,7 +33,7 @@ static int current_statement_begin__;
 stan::io::program_reader prog_reader__() {
     stan::io::program_reader reader;
     reader.add_event(0, 0, "start", "model_bkmr");
-    reader.add_event(48, 46, "end", "model_bkmr");
+    reader.add_event(51, 49, "end", "model_bkmr");
     return reader;
 }
 #include <stan_meta_header.hpp>
@@ -50,7 +50,8 @@ private:
         double sigma_b;
         std::vector<int> y;
         std::vector<int> n;
-        matrix_d X;
+        matrix_d Q;
+        matrix_d R_inv;
         matrix_d M;
         matrix_d P;
 public:
@@ -169,20 +170,34 @@ public:
                 check_greater_or_equal(function__, "n[i_0__]", n[i_0__], 1);
             }
             current_statement_begin__ = 18;
-            validate_non_negative_index("X", "N", N);
-            validate_non_negative_index("X", "p", p);
-            context__.validate_dims("data initialization", "X", "matrix_d", context__.to_vec(N,p));
-            X = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(N, p);
-            vals_r__ = context__.vals_r("X");
+            validate_non_negative_index("Q", "N", N);
+            validate_non_negative_index("Q", "p", p);
+            context__.validate_dims("data initialization", "Q", "matrix_d", context__.to_vec(N,p));
+            Q = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(N, p);
+            vals_r__ = context__.vals_r("Q");
             pos__ = 0;
-            size_t X_j_2_max__ = p;
-            size_t X_j_1_max__ = N;
-            for (size_t j_2__ = 0; j_2__ < X_j_2_max__; ++j_2__) {
-                for (size_t j_1__ = 0; j_1__ < X_j_1_max__; ++j_1__) {
-                    X(j_1__, j_2__) = vals_r__[pos__++];
+            size_t Q_j_2_max__ = p;
+            size_t Q_j_1_max__ = N;
+            for (size_t j_2__ = 0; j_2__ < Q_j_2_max__; ++j_2__) {
+                for (size_t j_1__ = 0; j_1__ < Q_j_1_max__; ++j_1__) {
+                    Q(j_1__, j_2__) = vals_r__[pos__++];
                 }
             }
             current_statement_begin__ = 19;
+            validate_non_negative_index("R_inv", "p", p);
+            validate_non_negative_index("R_inv", "p", p);
+            context__.validate_dims("data initialization", "R_inv", "matrix_d", context__.to_vec(p,p));
+            R_inv = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(p, p);
+            vals_r__ = context__.vals_r("R_inv");
+            pos__ = 0;
+            size_t R_inv_j_2_max__ = p;
+            size_t R_inv_j_1_max__ = p;
+            for (size_t j_2__ = 0; j_2__ < R_inv_j_2_max__; ++j_2__) {
+                for (size_t j_1__ = 0; j_1__ < R_inv_j_1_max__; ++j_1__) {
+                    R_inv(j_1__, j_2__) = vals_r__[pos__++];
+                }
+            }
+            current_statement_begin__ = 20;
             validate_non_negative_index("M", "N", N);
             validate_non_negative_index("M", "m", m);
             context__.validate_dims("data initialization", "M", "matrix_d", context__.to_vec(N,m));
@@ -196,7 +211,7 @@ public:
                     M(j_1__, j_2__) = vals_r__[pos__++];
                 }
             }
-            current_statement_begin__ = 20;
+            current_statement_begin__ = 21;
             validate_non_negative_index("P", "m", m);
             validate_non_negative_index("P", "m", m);
             context__.validate_dims("data initialization", "P", "matrix_d", context__.to_vec(m,m));
@@ -217,7 +232,7 @@ public:
             num_params_r__ = 0U;
             param_ranges_i__.clear();
             current_statement_begin__ = 24;
-            validate_non_negative_index("beta", "p", p);
+            validate_non_negative_index("beta_", "p", p);
             num_params_r__ += p;
             current_statement_begin__ = 25;
             validate_non_negative_index("h", "m", m);
@@ -245,21 +260,21 @@ public:
         std::vector<double> vals_r__;
         std::vector<int> vals_i__;
         current_statement_begin__ = 24;
-        if (!(context__.contains_r("beta")))
-            stan::lang::rethrow_located(std::runtime_error(std::string("Variable beta missing")), current_statement_begin__, prog_reader__());
-        vals_r__ = context__.vals_r("beta");
+        if (!(context__.contains_r("beta_")))
+            stan::lang::rethrow_located(std::runtime_error(std::string("Variable beta_ missing")), current_statement_begin__, prog_reader__());
+        vals_r__ = context__.vals_r("beta_");
         pos__ = 0U;
-        validate_non_negative_index("beta", "p", p);
-        context__.validate_dims("parameter initialization", "beta", "vector_d", context__.to_vec(p));
-        Eigen::Matrix<double, Eigen::Dynamic, 1> beta(p);
-        size_t beta_j_1_max__ = p;
-        for (size_t j_1__ = 0; j_1__ < beta_j_1_max__; ++j_1__) {
-            beta(j_1__) = vals_r__[pos__++];
+        validate_non_negative_index("beta_", "p", p);
+        context__.validate_dims("parameter initialization", "beta_", "vector_d", context__.to_vec(p));
+        Eigen::Matrix<double, Eigen::Dynamic, 1> beta_(p);
+        size_t beta__j_1_max__ = p;
+        for (size_t j_1__ = 0; j_1__ < beta__j_1_max__; ++j_1__) {
+            beta_(j_1__) = vals_r__[pos__++];
         }
         try {
-            writer__.vector_unconstrain(beta);
+            writer__.vector_unconstrain(beta_);
         } catch (const std::exception& e) {
-            stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable beta: ") + e.what()), current_statement_begin__, prog_reader__());
+            stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable beta_: ") + e.what()), current_statement_begin__, prog_reader__());
         }
         current_statement_begin__ = 25;
         if (!(context__.contains_r("h")))
@@ -337,12 +352,12 @@ public:
             stan::io::reader<local_scalar_t__> in__(params_r__, params_i__);
             // model parameters
             current_statement_begin__ = 24;
-            Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> beta;
-            (void) beta;  // dummy to suppress unused var warning
+            Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> beta_;
+            (void) beta_;  // dummy to suppress unused var warning
             if (jacobian__)
-                beta = in__.vector_constrain(p, lp__);
+                beta_ = in__.vector_constrain(p, lp__);
             else
-                beta = in__.vector_constrain(p);
+                beta_ = in__.vector_constrain(p);
             current_statement_begin__ = 25;
             Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> h;
             (void) h;  // dummy to suppress unused var warning
@@ -367,20 +382,39 @@ public:
                 sigma = in__.scalar_lb_constrain(0, lp__);
             else
                 sigma = in__.scalar_lb_constrain(0);
+            // transformed parameters
+            current_statement_begin__ = 31;
+            validate_non_negative_index("beta", "p", p);
+            Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> beta(p);
+            stan::math::initialize(beta, DUMMY_VAR__);
+            stan::math::fill(beta, DUMMY_VAR__);
+            stan::math::assign(beta,multiply(R_inv, beta_));
+            // validate transformed parameters
+            const char* function__ = "validate transformed params";
+            (void) function__;  // dummy to suppress unused var warning
+            current_statement_begin__ = 31;
+            size_t beta_j_1_max__ = p;
+            for (size_t j_1__ = 0; j_1__ < beta_j_1_max__; ++j_1__) {
+                if (stan::math::is_uninitialized(beta(j_1__))) {
+                    std::stringstream msg__;
+                    msg__ << "Undefined transformed parameter: beta" << "(" << j_1__ << ")";
+                    stan::lang::rethrow_located(std::runtime_error(std::string("Error initializing variable beta: ") + msg__.str()), current_statement_begin__, prog_reader__());
+                }
+            }
             // model body
-            current_statement_begin__ = 32;
+            current_statement_begin__ = 35;
             if (as_bool(logical_eq(est_phi, 1))) {
-                current_statement_begin__ = 33;
+                current_statement_begin__ = 36;
                 lp_accum__.add(multi_normal_log<propto__>(h, rep_vector(0, m), multiply(pow(sigma, 2), stan::math::exp(divide(minus(P), pow(get_base1(phi, est_phi, "phi", 1), 2))))));
-                current_statement_begin__ = 34;
+                current_statement_begin__ = 37;
                 lp_accum__.add(normal_log<propto__>(phi, phi_a, phi_b));
             } else {
-                current_statement_begin__ = 37;
+                current_statement_begin__ = 40;
                 lp_accum__.add(multi_normal_log<propto__>(h, rep_vector(0, m), multiply(pow(sigma, 2), stan::math::exp(minus(P)))));
             }
-            current_statement_begin__ = 40;
-            lp_accum__.add(binomial_logit_log<propto__>(y, n, add(multiply(X, beta), multiply(M, h))));
-            current_statement_begin__ = 42;
+            current_statement_begin__ = 43;
+            lp_accum__.add(binomial_logit_log<propto__>(y, n, add(multiply(Q, beta_), multiply(M, h))));
+            current_statement_begin__ = 45;
             lp_accum__.add(normal_log<propto__>(sigma, sigma_a, sigma_b));
         } catch (const std::exception& e) {
             stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());
@@ -402,11 +436,12 @@ public:
     }
     void get_param_names(std::vector<std::string>& names__) const {
         names__.resize(0);
-        names__.push_back("beta");
+        names__.push_back("beta_");
         names__.push_back("h");
         names__.push_back("phi");
         names__.push_back("sigma");
-        names__.push_back("yhat");
+        names__.push_back("beta");
+        names__.push_back("eta_hat");
     }
     void get_dims(std::vector<std::vector<size_t> >& dimss__) const {
         dimss__.resize(0);
@@ -421,6 +456,9 @@ public:
         dims__.push_back(est_phi);
         dimss__.push_back(dims__);
         dims__.resize(0);
+        dimss__.push_back(dims__);
+        dims__.resize(0);
+        dims__.push_back(p);
         dimss__.push_back(dims__);
         dims__.resize(0);
         dims__.push_back(N);
@@ -440,10 +478,10 @@ public:
         static const char* function__ = "model_bkmr_namespace::write_array";
         (void) function__;  // dummy to suppress unused var warning
         // read-transform, write parameters
-        Eigen::Matrix<double, Eigen::Dynamic, 1> beta = in__.vector_constrain(p);
-        size_t beta_j_1_max__ = p;
-        for (size_t j_1__ = 0; j_1__ < beta_j_1_max__; ++j_1__) {
-            vars__.push_back(beta(j_1__));
+        Eigen::Matrix<double, Eigen::Dynamic, 1> beta_ = in__.vector_constrain(p);
+        size_t beta__j_1_max__ = p;
+        for (size_t j_1__ = 0; j_1__ < beta__j_1_max__; ++j_1__) {
+            vars__.push_back(beta_(j_1__));
         }
         Eigen::Matrix<double, Eigen::Dynamic, 1> h = in__.vector_constrain(m);
         size_t h_j_1_max__ = m;
@@ -469,23 +507,37 @@ public:
         (void) DUMMY_VAR__;  // suppress unused var warning
         if (!include_tparams__ && !include_gqs__) return;
         try {
+            // declare and define transformed parameters
+            current_statement_begin__ = 31;
+            validate_non_negative_index("beta", "p", p);
+            Eigen::Matrix<double, Eigen::Dynamic, 1> beta(p);
+            stan::math::initialize(beta, DUMMY_VAR__);
+            stan::math::fill(beta, DUMMY_VAR__);
+            stan::math::assign(beta,multiply(R_inv, beta_));
             if (!include_gqs__ && !include_tparams__) return;
+            // validate transformed parameters
+            const char* function__ = "validate transformed params";
+            (void) function__;  // dummy to suppress unused var warning
+            // write transformed parameters
+            if (include_tparams__) {
+                size_t beta_j_1_max__ = p;
+                for (size_t j_1__ = 0; j_1__ < beta_j_1_max__; ++j_1__) {
+                    vars__.push_back(beta(j_1__));
+                }
+            }
             if (!include_gqs__) return;
             // declare and define generated quantities
-            current_statement_begin__ = 45;
-            validate_non_negative_index("yhat", "N", N);
-            std::vector<int> yhat(N, int(0));
-            stan::math::fill(yhat, std::numeric_limits<int>::min());
-            stan::math::assign(yhat,binomial_rng(n, elt_divide(stan::math::exp(add(multiply(X, beta), multiply(M, h))), add(1, stan::math::exp(add(multiply(X, beta), multiply(M, h))))), base_rng__));
+            current_statement_begin__ = 48;
+            validate_non_negative_index("eta_hat", "N", N);
+            Eigen::Matrix<double, Eigen::Dynamic, 1> eta_hat(N);
+            stan::math::initialize(eta_hat, DUMMY_VAR__);
+            stan::math::fill(eta_hat, DUMMY_VAR__);
+            stan::math::assign(eta_hat,inv_logit(add(multiply(Q, beta_), multiply(M, h))));
             // validate, write generated quantities
-            current_statement_begin__ = 45;
-            size_t yhat_i_0_max__ = N;
-            for (size_t i_0__ = 0; i_0__ < yhat_i_0_max__; ++i_0__) {
-                check_greater_or_equal(function__, "yhat[i_0__]", yhat[i_0__], 0);
-            }
-            size_t yhat_k_0_max__ = N;
-            for (size_t k_0__ = 0; k_0__ < yhat_k_0_max__; ++k_0__) {
-                vars__.push_back(yhat[k_0__]);
+            current_statement_begin__ = 48;
+            size_t eta_hat_j_1_max__ = N;
+            for (size_t j_1__ = 0; j_1__ < eta_hat_j_1_max__; ++j_1__) {
+                vars__.push_back(eta_hat(j_1__));
             }
         } catch (const std::exception& e) {
             stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());
@@ -517,10 +569,10 @@ public:
                                  bool include_tparams__ = true,
                                  bool include_gqs__ = true) const {
         std::stringstream param_name_stream__;
-        size_t beta_j_1_max__ = p;
-        for (size_t j_1__ = 0; j_1__ < beta_j_1_max__; ++j_1__) {
+        size_t beta__j_1_max__ = p;
+        for (size_t j_1__ = 0; j_1__ < beta__j_1_max__; ++j_1__) {
             param_name_stream__.str(std::string());
-            param_name_stream__ << "beta" << '.' << j_1__ + 1;
+            param_name_stream__ << "beta_" << '.' << j_1__ + 1;
             param_names__.push_back(param_name_stream__.str());
         }
         size_t h_j_1_max__ = m;
@@ -540,12 +592,18 @@ public:
         param_names__.push_back(param_name_stream__.str());
         if (!include_gqs__ && !include_tparams__) return;
         if (include_tparams__) {
+            size_t beta_j_1_max__ = p;
+            for (size_t j_1__ = 0; j_1__ < beta_j_1_max__; ++j_1__) {
+                param_name_stream__.str(std::string());
+                param_name_stream__ << "beta" << '.' << j_1__ + 1;
+                param_names__.push_back(param_name_stream__.str());
+            }
         }
         if (!include_gqs__) return;
-        size_t yhat_k_0_max__ = N;
-        for (size_t k_0__ = 0; k_0__ < yhat_k_0_max__; ++k_0__) {
+        size_t eta_hat_j_1_max__ = N;
+        for (size_t j_1__ = 0; j_1__ < eta_hat_j_1_max__; ++j_1__) {
             param_name_stream__.str(std::string());
-            param_name_stream__ << "yhat" << '.' << k_0__ + 1;
+            param_name_stream__ << "eta_hat" << '.' << j_1__ + 1;
             param_names__.push_back(param_name_stream__.str());
         }
     }
@@ -553,10 +611,10 @@ public:
                                    bool include_tparams__ = true,
                                    bool include_gqs__ = true) const {
         std::stringstream param_name_stream__;
-        size_t beta_j_1_max__ = p;
-        for (size_t j_1__ = 0; j_1__ < beta_j_1_max__; ++j_1__) {
+        size_t beta__j_1_max__ = p;
+        for (size_t j_1__ = 0; j_1__ < beta__j_1_max__; ++j_1__) {
             param_name_stream__.str(std::string());
-            param_name_stream__ << "beta" << '.' << j_1__ + 1;
+            param_name_stream__ << "beta_" << '.' << j_1__ + 1;
             param_names__.push_back(param_name_stream__.str());
         }
         size_t h_j_1_max__ = m;
@@ -576,12 +634,18 @@ public:
         param_names__.push_back(param_name_stream__.str());
         if (!include_gqs__ && !include_tparams__) return;
         if (include_tparams__) {
+            size_t beta_j_1_max__ = p;
+            for (size_t j_1__ = 0; j_1__ < beta_j_1_max__; ++j_1__) {
+                param_name_stream__.str(std::string());
+                param_name_stream__ << "beta" << '.' << j_1__ + 1;
+                param_names__.push_back(param_name_stream__.str());
+            }
         }
         if (!include_gqs__) return;
-        size_t yhat_k_0_max__ = N;
-        for (size_t k_0__ = 0; k_0__ < yhat_k_0_max__; ++k_0__) {
+        size_t eta_hat_j_1_max__ = N;
+        for (size_t j_1__ = 0; j_1__ < eta_hat_j_1_max__; ++j_1__) {
             param_name_stream__.str(std::string());
-            param_name_stream__ << "yhat" << '.' << k_0__ + 1;
+            param_name_stream__ << "eta_hat" << '.' << j_1__ + 1;
             param_names__.push_back(param_name_stream__.str());
         }
     }

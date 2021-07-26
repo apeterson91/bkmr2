@@ -6,10 +6,13 @@
 \usage{
 \method{plot}{bkmreg}(x, plotfun = "h_dist", ...)
 }
+\arguments{
+\item{x}{bkmreg object}
+
+\item{plotfun}{one of c("h_dist","ppc")}
+
+\item{...}{optional arguments for \code{plotfun}}
+}
 \description{
-@aliases plot
-@param x bkmreg object
-@param plotfun one of c("h_dist","ppc")
-@param ... optional arguments for \code{plotfun}
-@export
+Plotting function for bkmreg objects
 }

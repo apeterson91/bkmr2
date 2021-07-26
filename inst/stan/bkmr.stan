@@ -15,18 +15,21 @@ data {
 	real<lower = 0> sigma_b;
 	int<lower=0> y[N];
 	int<lower=1> n[N];
-	matrix[N,p] X;
+	matrix[N,p] Q;
+	matrix[p,p] R_inv;
 	matrix[N,m] M;
 	matrix[m,m] P;
 }
-
 parameters {
-	vector[p] beta;
+	vector[p] beta_;
 	vector[m] h;
 	real<lower=0> phi[est_phi];
 	real<lower=0> sigma;
 }
 
+transformed parameters{
+	vector[p] beta = R_inv * beta_;
+}
 model {
 
   if(est_phi==1){
@@ -37,11 +40,11 @@ model {
 	   h ~ multi_normal(rep_vector(0,m),pow(sigma,2) * exp( - P ) );
 
 
-	y ~ binomial_logit(n,X*beta + M*h);
+	y ~ binomial_logit(n,Q*beta_ + M*h);
 
   sigma ~ normal(sigma_a,sigma_b);
 }
 generated quantities{
-	int<lower=0> yhat[N] = binomial_rng(n,exp(X*beta + M*h) ./ (1 + exp( X*beta + M*h)));
+	vector[N] eta_hat = inv_logit(Q*beta_ + M*h);
 }
 

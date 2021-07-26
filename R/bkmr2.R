@@ -39,6 +39,10 @@ bkmr2 <- function(formula,data,P,
     X <- model.matrix(mt,mf)
 
     M <- get_M(nrow(P),nrow(X))
+	qrc <- qr(X)
+	Q <- qr.Q(qrc)
+	R <- qr.R(qrc)
+	R_inv <- solve(R)
 
     standata <- list(N = nrow(X),
                      p = ncol(X),
@@ -46,7 +50,8 @@ bkmr2 <- function(formula,data,P,
                      est_phi = (est_phi)*1L,
                      y = y,
                      n = n,
-                     X = X,
+					 Q = Q,
+					 R_inv = R_inv,
                      P = P^2,
                      M = M,
                      sigma_a = sigma_a,
@@ -57,12 +62,15 @@ bkmr2 <- function(formula,data,P,
     sampling_args <- set_sampling_args(object = stanmodels$bkmr,
 									   control = list(adapt_delta = 0.85,
 													  max_treedepth = 10),
-									   pars = c("beta","sigma",if(est_phi) "phi","h",'yhat'),
+									   pars = c("beta","sigma",if(est_phi) "phi","h",'eta_hat'),
 									   data = standata,
 									   show_messages = FALSE,
 									   save_warmup = FALSE,...)
 
+
     fit <- do.call(sampling,sampling_args)
+
+
     out <- list(fit = fit,
                 call = call,
                 X = X,

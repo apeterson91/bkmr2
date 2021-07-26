@@ -26,7 +26,8 @@ Imports:
     tidyr,
     dplyr,
     ggplot2,
-    purrr
+    purrr,
+    LaplacesDemon
 LinkingTo: 
     BH (>= 1.66.0),
     Rcpp (>= 0.12.0),

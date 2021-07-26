@@ -1,11 +1,10 @@
 #' Plotting function for bkmreg objects
 #' 
 #'
-#'  @aliases plot
-#'  @param x bkmreg object
-#'  @param plotfun one of c("h_dist","ppc")
-#'  @param ... optional arguments for `plotfun`
-#'  @export
+#' @param x bkmreg object
+#' @param plotfun one of c("h_dist","ppc")
+#' @param ... optional arguments for `plotfun`
+#' @export
 #'
 plot.bkmreg <- function(x,plotfun="h_dist",...){
 
